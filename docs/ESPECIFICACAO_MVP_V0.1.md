@@ -4,6 +4,8 @@
 
 Entregar uma primeira versão executável da Rádio MB para validar o fluxo completo antes do deploy na VPS e antes da implantação nas 6 lojas.
 
+Loja piloto definida: **Megashop Santo Ângelo** (`megashop`).
+
 Fluxo-alvo:
 
 VPS -> API/grade -> Player Web -> computador da loja -> cabo de áudio -> amplificador -> caixas.
@@ -134,10 +136,10 @@ No MVP inicial, os dados podem permanecer em memória/arquivo local apenas para 
 - backend inicia sem erro;
 - `/health` responde `ok`;
 - player abre no navegador;
-- player identifica uma loja válida;
+- player identifica a Megashop;
 - player consulta `/next`;
 - músicas sem licença aprovada são ignoradas;
-- heartbeat aparece no backend;
+- heartbeat aparece no backend para `megashop`;
 - execução é registrada;
 - ausência de conexão não trava o player;
 - nenhum controle de escolha de faixa é exposto ao gerente.
@@ -161,5 +163,5 @@ Somente depois de o MVP local passar nos critérios acima:
 2. implementar painel administrativo;
 3. cadastrar catálogo piloto de 50–100 faixas aprovadas;
 4. preparar deploy na VPS;
-5. pilotar em uma loja;
+5. pilotar na Megashop Santo Ângelo;
 6. executar CHECK do PDCA.
