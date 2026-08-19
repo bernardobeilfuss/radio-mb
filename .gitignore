@@ -1,0 +1,10 @@
+.env
+node_modules/
+__pycache__/
+*.log
+storage/music/*
+!storage/music/.gitkeep
+storage/campaigns/*
+!storage/campaigns/.gitkeep
+storage/licenses/*
+!storage/licenses/.gitkeep
