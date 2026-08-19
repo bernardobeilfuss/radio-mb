@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rádio MB</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #111; color: #fff; display: grid; place-items: center; min-height: 100vh; }
+    main { width: min(560px, 90vw); text-align: center; }
+    .status { font-weight: 700; margin: 16px 0; }
+    .online { color: #8fd18f; }
+    .offline { color: #ff9b9b; }
+    .card { background: #1d1d1d; border-radius: 16px; padding: 24px; }
+    button { margin-top: 20px; padding: 12px 20px; border: 0; border-radius: 10px; cursor: pointer; }
+    small { color: #bbb; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Rádio MB</h1>
+    <div id="status" class="status offline">OFFLINE</div>
+    <div class="card">
+      <small>Loja</small>
+      <h2 id="store">-</h2>
+      <small>Tocando agora</small>
+      <h3 id="title">Aguardando programação</h3>
+      <p id="artist"></p>
+      <audio id="audio" preload="auto"></audio>
+      <button id="start">Iniciar Rádio</button>
+    </div>
+  </main>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    const storeSlug = params.get('loja') || 'panambi';
+    const apiBase = params.get('api') || 'http://localhost:8000';
+    const statusEl = document.getElementById('status');
+    const storeEl = document.getElementById('store');
+    const titleEl = document.getElementById('title');
+    const artistEl = document.getElementById('artist');
+    const audio = document.getElementById('audio');
+    const startBtn = document.getElementById('start');
+
+    let currentMedia = null;
+    let heartbeatTimer = null;
+
+    async function request(path, options = {}) {
+      const response = await fetch(`${apiBase}${path}`, options);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    }
+
+    function setOnline(online) {
+      statusEl.textContent = online ? 'ONLINE' : 'OFFLINE / FALLBACK';
+      statusEl.className = `status ${online ? 'online' : 'offline'}`;
+    }
+
+    async function loadStore() {
+      const stores = await request('/api/stores');
+      const store = stores.find(item => item.slug === storeSlug);
+      if (!store) throw new Error('Loja inválida');
+      storeEl.textContent = store.name;
+    }
+
+    async function heartbeat() {
+      try {
+        await request(`/api/player/${storeSlug}/heartbeat`, { method: 'POST' });
+        setOnline(true);
+      } catch (error) {
+        setOnline(false);
+      }
+    }
+
+    async function logPlayback(event, mediaId) {
+      try {
+        await request(`/api/player/${storeSlug}/playback/${event}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ media_id: mediaId })
+        });
+      } catch (_) {}
+    }
+
+    async function loadNext() {
+      try {
+        currentMedia = await request(`/api/player/${storeSlug}/next`);
+        setOnline(true);
+        titleEl.textContent = currentMedia.title;
+        artistEl.textContent = currentMedia.artist || '';
+
+        if (!currentMedia.file_url) {
+          artistEl.textContent += ' — mídia de teste sem arquivo de áudio';
+          return;
+        }
+
+        audio.src = currentMedia.file_url;
+        await logPlayback('start', currentMedia.id);
+        await audio.play();
+      } catch (error) {
+        setOnline(false);
+        titleEl.textContent = 'Programação indisponível';
+        artistEl.textContent = 'Fallback offline será implementado no próximo ciclo';
+      }
+    }
+
+    audio.addEventListener('ended', async () => {
+      if (currentMedia) await logPlayback('end', currentMedia.id);
+      await loadNext();
+    });
+
+    startBtn.addEventListener('click', async () => {
+      startBtn.disabled = true;
+      await loadNext();
+      await heartbeat();
+      heartbeatTimer = setInterval(heartbeat, 30000);
+    });
+
+    loadStore().catch(() => {
+      storeEl.textContent = 'Loja inválida';
+      setOnline(false);
+    });
+  </script>
+</body>
+</html>
