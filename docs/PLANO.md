@@ -12,7 +12,7 @@
 
 ## DO
 
-Piloto em uma loja, com catálogo inicial de 50–100 faixas.
+Piloto na **Megashop Santo Ângelo**, com catálogo inicial de 50–100 faixas.
 
 ## CHECK
 
