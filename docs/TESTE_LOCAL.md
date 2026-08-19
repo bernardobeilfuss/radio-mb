@@ -1,5 +1,9 @@
 # Teste local — Rádio MB MVP v0.1
 
+## Loja piloto
+
+O teste inicial e o primeiro piloto de implantação serão feitos na **Megashop Santo Ângelo** (`megashop`).
+
 ## Pré-requisitos
 
 - Python 3.11+
@@ -60,14 +64,14 @@ python -m http.server 8080 --directory apps/player
 Abra:
 
 ```text
-http://localhost:8080/?loja=panambi&api=http://localhost:8000
+http://localhost:8080/?loja=megashop&api=http://localhost:8000
 ```
 
 Clique em `Iniciar Rádio`.
 
 Como ainda não há arquivo de áudio real, o player deve:
 
-- identificar a loja;
+- identificar a Megashop Santo Ângelo;
 - ficar ONLINE;
 - buscar a faixa piloto aprovada;
 - exibir o título;
@@ -82,7 +86,7 @@ Acesse:
 http://localhost:8000/api/debug/status
 ```
 
-Após iniciar o player, deve existir heartbeat para a loja.
+Após iniciar o player, deve existir heartbeat para `megashop`.
 
 ## Lojas válidas
 
@@ -95,4 +99,4 @@ Após iniciar o player, deve existir heartbeat para a loja.
 
 ## Critério para avançar
 
-Não avançar para deploy na VPS enquanto o teste local não passar para pelo menos uma loja.
+Não avançar para deploy na VPS enquanto o teste local não passar para a Megashop.
